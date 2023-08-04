@@ -1,17 +1,11 @@
-FROM nginx:latest
+FROM alpine:latest
 
-RUN apt-get update && \
-    apt-get install build-essential\ 
-                    libpcre3 \
-                    libpcre3-dev \
-                    zlib1g \
-                    zlib1g-dev \
-                    libssl1.1 \
-                    libssl-dev \
+RUN apk update && \
+    apk add build-essential \
                     -y && \
-    apt-get clean && rm -rf /var/lib/apt/lists/*
+    apk clean && rm -rf /var/cache/apk/*
 
-COPY ./requirements/nginx/nginx-1.25.1.tar.gz .
+COPY nginx-1.25.1.tar.gz .
 
 RUN tar -xvf nginx-1.19.2.tar.gz && rm nginx-1.19.2.tar.gz
 
