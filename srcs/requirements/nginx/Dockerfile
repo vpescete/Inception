@@ -10,8 +10,6 @@ RUN apk update && \
 
 COPY conf/mynginx.conf /etc/nginx/conf.d/
 
-
-
 # COPY pcre-8.45.tar.gz .
 # RUN tar -xvf pcre-8.45.tar.gz && rm pcre-8.45.tar.gz
 # RUN cd pcre-8.45 && \
