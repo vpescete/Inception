@@ -1,7 +1,7 @@
-.PHONY: all clean
+COMPOSE_FILE	=	./srcs/docker-compose.yml
 
 all:
-	docker-compose -f srcs/docker-compose.yml up -d
+	docker-compose -f $(COMPOSE_FILE) up -d
 
-clean:
-	docker-compose -f srcs/docker-compose.yml down
+stop:
+	docker-compose -f $(COMPOSE_FILE) down
