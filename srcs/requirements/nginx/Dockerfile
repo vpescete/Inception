@@ -42,4 +42,4 @@ COPY conf/mynginx.conf /etc/nginx/conf.d/
 #     make && make install
 # RUN rm -rf /nginx-1.25.1
 
-CMD ["nginx2", "-p 8080:81 -g", "daemon off;"]
+CMD ["nginx", "-p 8080:81", "-g", "daemon off;"]
