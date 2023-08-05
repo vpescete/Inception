@@ -5,6 +5,7 @@ services:
   nginx:
     build: requirements/nginx
     container_name: nginx
+    run: --publish 8080:80 nginx
   
   # wordpress:
   #   build: requirements/wordpress

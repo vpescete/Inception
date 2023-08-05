@@ -10,6 +10,8 @@ RUN apk update && \
 
 COPY conf/mynginx.conf /etc/nginx/conf.d/
 
+
+
 # COPY pcre-8.45.tar.gz .
 # RUN tar -xvf pcre-8.45.tar.gz && rm pcre-8.45.tar.gz
 # RUN cd pcre-8.45 && \
@@ -40,4 +42,4 @@ COPY conf/mynginx.conf /etc/nginx/conf.d/
 #     make && make install
 # RUN rm -rf /nginx-1.25.1
 
-CMD ["nginx", "-g", "daemon off;"]
+CMD ["nginx2", "-p 8080:81 -g", "daemon off;"]
