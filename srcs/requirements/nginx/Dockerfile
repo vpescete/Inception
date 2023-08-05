@@ -8,7 +8,7 @@ RUN apk update && \
         bash && \
     apk cache clean && rm -rf /var/cache/apk/*
 
-COPY conf/mynginx.conf /etc/nginx/conf.d/
+COPY conf/mynginx.conf /etc/nginx/conf.d/nginx.conf
 
 # COPY pcre-8.45.tar.gz .
 # RUN tar -xvf pcre-8.45.tar.gz && rm pcre-8.45.tar.gz
