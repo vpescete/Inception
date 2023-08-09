@@ -16,20 +16,18 @@ services:
       - network
   
   mariadb:
-    build: requirements/mariadb/
     container_name: mariadb
-    ports:
-      - "3306:3306"
+    build: ./requirements/mariadb
+    #volumes allow to store in a persistent disk the content in a local disk
+    #db_data is a volume created by docker directly
     volumes:
-      - "~/Desktop/inception/mariadb:/var/lib/mysql"
+      - mariadb_data:/var/lib/mysql
+    # in case of problem we restart automatically the container
     networks:
-      - backend
+      - network
     restart: always
-    environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-      MYSQL_DATABASE: ${MYSQL_DATABASE}
-      MYSQL_USER: ${MYSQL_USER}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    env_file:
+      - .env
 
   wordpress:
     container_name: wordpress
