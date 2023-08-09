@@ -1,19 +1,18 @@
-FROM alpine:latest
+FROM debian:buster
 
-RUN apk update && apk add --no-cache \
-    wget \
-    curl \
-    bash \
-    php7 \
-    php7-cgi \
-    php7-mysqlnd \
-    php7-fpm \
-    php7-pdo \
-    php7-gd \
-    php7-cli \
-    php7-mbstring \
-    redis \
-    php7-redis \
+RUN apt-get update && apt-get -y install \
+	wget \
+	curl \
+	bash \
+	php \
+	php-cgi \
+	php-mysql \
+	php-fpm \
+	php-pdo \
+	php-gd php-cli \
+	php-mbstring \
+	redis \
+	php-redis \
 	&& rm -rf /var/lib/apt/lists/*
 
 # I need to install wp_cli command and put it in the right directory /usr/local/bin
