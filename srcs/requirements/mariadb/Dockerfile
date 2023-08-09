@@ -6,7 +6,6 @@ RUN apk update && apk add --no-cache \
     bash \
     php7 \
     php7-cgi \
-    php7-mysqli \
     php7-fpm \
     php7-pdo \
     php7-gd \
@@ -14,6 +13,7 @@ RUN apk update && apk add --no-cache \
     php7-mbstring \
     redis \
     php7-redis \
+    php7-mysqlnd \
     && rm -rf /var/lib/apt/lists/*
 
 #Allow to run the daemon of mysql
