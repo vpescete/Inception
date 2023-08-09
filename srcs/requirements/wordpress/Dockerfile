@@ -27,9 +27,9 @@ COPY ./conf/www.conf /etc/php/7.3/fpm/pool.d/
 RUN mkdir /run/php
 
 #we copy the script, give the right to launch it in local on our computer
-COPY ./tools/create_wordpress.sh /usr/local/bin/
-RUN chmod +x /usr/local/bin/create_wordpress.sh
-ENTRYPOINT ["/usr/local/bin/create_wordpress.sh"]
+COPY ./tools/setup-wordpress.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/setup-wordpress.sh
+ENTRYPOINT ["/usr/local/bin/setup-wordpress.sh"]
 
 #We go the html directory
 WORKDIR /var/www/html/
