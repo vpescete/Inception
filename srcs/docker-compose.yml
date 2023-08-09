@@ -45,6 +45,9 @@ services:
     networks:
       - network
 
+volumes:
+  mariadb_data:
+
 networks:
     network:
       driver: bridge
