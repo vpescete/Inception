@@ -9,6 +9,8 @@ services:
       - "8080:80"
     networks:
       - mynetwork
+    volumes:
+      - ./html:/usr/share/nginx/html
   
   # wordpress:
   #   build: requirements/wordpress
