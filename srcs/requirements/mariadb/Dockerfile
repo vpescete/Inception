@@ -1,19 +1,9 @@
-FROM alpine:latest
+FROM debian:buster
 
-RUN apk update && apk add --no-cache \
-    wget \
-    curl \
-    bash \
-    php7 \
-    php7-cgi \
-    php7-fpm \
-    php7-pdo \
-    php7-gd \
-    php7-cli \
-    php7-mbstring \
-    php7-redis \
-    php7-mysqli \
-    redis \
+RUN apt-get update
+RUN apt-get install -y mariadb-server \
+    mariadb-client \
+    vim \
     && rm -rf /var/lib/apt/lists/*
 
 #Allow to run the daemon of mysql
@@ -41,4 +31,3 @@ ENTRYPOINT [ "/usr/local/bin/mariadb.sh" ]
 
 #Command to launch mariadb and enable the database to listen globally - also can be put on mysqldump.cnf file
 CMD ["mysqld", "--bind-address=0.0.0.0"]
-
