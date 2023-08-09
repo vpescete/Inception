@@ -8,12 +8,12 @@ RUN apk update && \
         bash && \
     apk cache clean && rm -rf /var/cache/apk/*
 
-# Creazione della cartella di montaggio
-RUN mkdir -p /etc/nginx/conf.d
-RUN mkdir -p /etc/nginx/html
+RUN mkdir /etc/nginx/ssl
+RUN openssl req -newkey rsa:4096 -x509 -sha256 -days 365 -nodes \
+       -out /etc/nginx/ssl/vpescete.crt \
+       -keyout /etc/nginx/ssl/vpescete.key \
+       -subj "/C=IT/ST=Rome/L=Rome/O=42 School/OU=vpescete/CN=vpescete/"
 
-COPY ../../html /etc/nginx/html
-
-COPY conf/mynginx.conf /etc/nginx/conf.d/nginx.conf
+COPY ./conf/nginx.conf /etc/nginx/conf.d
 
 CMD ["nginx", "-g", "daemon off;"]

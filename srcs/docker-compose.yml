@@ -6,11 +6,12 @@ services:
     build: requirements/nginx
     container_name: nginx
     ports:
-      - "8080:80"
-    networks:
-      - mynetwork
+      - 443:443
     volumes:
-      - ./html:/usr/share/nginx/html
+      - ./html:etc/nginx/html
+    restart: always
+    networks:
+      - network
   
   # wordpress:
   #   build: requirements/wordpress
@@ -21,5 +22,5 @@ services:
   #   container_name: mariadb
 
 networks:
-    mynetwork:
+    network:
       driver: bridge
