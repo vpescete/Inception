@@ -8,6 +8,9 @@ RUN apk update && \
         bash && \
     apk cache clean && rm -rf /var/cache/apk/*
 
+# Creazione della cartella di montaggio
+RUN mkdir -p /etc/nginx/conf.d
+
 COPY conf/mynginx.conf /etc/nginx/conf.d/nginx.conf
 
 # COPY pcre-8.45.tar.gz .
@@ -40,4 +43,4 @@ COPY conf/mynginx.conf /etc/nginx/conf.d/nginx.conf
 #     make && make install
 # RUN rm -rf /nginx-1.25.1
 
-CMD ["nginx", "-p 8080:81", "-g", "daemon off;"]
+CMD ["nginx", "-g", "daemon off;"]

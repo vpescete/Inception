@@ -7,6 +7,8 @@ services:
     container_name: nginx
     ports:
       - "8080:80"
+    networks:
+      - mynetwork
   
   # wordpress:
   #   build: requirements/wordpress
@@ -15,3 +17,7 @@ services:
   # mariadb:
   #   build: requirements/mariadb
   #   container_name: mariadb
+
+networks:
+    mynetwork:
+      driver: bridge
