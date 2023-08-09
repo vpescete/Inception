@@ -47,6 +47,7 @@ services:
 
 volumes:
   mariadb_data:
+  wordpress_data:
 
 networks:
     network:
