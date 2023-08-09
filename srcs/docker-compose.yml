@@ -8,7 +8,7 @@ services:
     ports:
       - 443:443
     volumes:
-      - ./html:etc/nginx/html
+      - wordpress_data:/var/www/html
     restart: always
     networks:
       - network
