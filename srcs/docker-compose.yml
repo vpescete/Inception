@@ -3,50 +3,27 @@ version: '3.8'
 services:
 
   nginx:
-    build: requirements/nginx
+    build: ./requirements/nginx
     container_name: nginx
     ports:
       - 443:443
-    volumes:
-      - wordpress_data:/var/www/html
-    restart: always
-    depends_on:
-      - wordpress
-    networks:
-      - network
-  
-  mariadb:
-    container_name: mariadb
-    build: ./requirements/mariadb
-    #volumes allow to store in a persistent disk the content in a local disk
-    #db_data is a volume created by docker directly
-    volumes:
-      - mariadb_data:/var/lib/mysql
-    # in case of problem we restart automatically the container
     networks:
       - network
     restart: always
-    env_file:
-      - .env
 
   wordpress:
     container_name: wordpress
-    #Create a depedency between the 2 container, db will be launched before
-    depends_on:
-      - mariadb
     build:
       context: ./requirements/wordpress
-      dockerfile: Dockerfile
-    restart: always
-    env_file:
-      - .env
-    volumes:
-      - wordpress_data:/var/www/html
     networks:
       - network
+    depends_on:
+      - nginx
+    volumes:
+      - wordpress_data:/var/www/html
+    restart: always
 
 volumes:
-  mariadb_data:
   wordpress_data:
 
 networks:

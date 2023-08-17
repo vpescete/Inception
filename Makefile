@@ -1,14 +1,24 @@
-COMPOSE_FILE	=	./srcs/docker-compose.yml
+DOCKER_COMPOSE = docker-compose -f ./srcs/docker-compose.yml
 
 all:
-	docker-compose -f $(COMPOSE_FILE) up -d
+	$(DOCKER_COMPOSE) up --build -d
 
 stop:
-	docker-compose -f $(COMPOSE_FILE) down
+	$(DOCKER_COMPOSE) down
 
 clean:
-	@docker stop $$(docker ps -qa);\
-	docker rm $$(docker ps -qa);\
-	docker rmi -f $$(docker images -qa);\
-	docker volume rm $$(docker volume ls -q);\
-	docker network rm $$(docker network ls -q);\
+	@if [ -n "$$(docker ps -q)" ]; then docker stop $$(docker ps -q); fi
+	@if [ -n "$$(docker ps -aq)" ]; then docker rm $$(docker ps -aq); fi
+	@if [ -n "$$(docker images -q)" ]; then docker rmi -f $$(docker images -q); fi
+	@if [ -n "$$(docker volume ls -q)" ]; then docker volume rm $$(docker volume ls -q); fi
+	@docker network ls --format "{{.Name}} {{.Driver}}" | \
+		grep -vE '(bridge|host|none)' | \
+		awk '{ print $$1 }' | \
+		xargs -r docker network rm
+
+prune:
+	@echo "This will remove all stopped containers, dangling images, and networks."
+	@echo "Use with caution! Press [Enter] to continue or [Ctrl+C] to cancel."
+	@read _
+	docker system prune -a
+
