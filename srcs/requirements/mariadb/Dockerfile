@@ -1,7 +1,11 @@
-FROM debian:buster
+FROM alpine:3.13
 
-RUN apt-get update
-RUN apt-get install -y mariadb-server \
-    mariadb-client \
-    vim \
-    && rm -rf /var/lib/apt/lists/*
+RUN apk update && apk upgrade && apk add --no-cache \
+        mariadb \
+        mariadb-client
+
+EXPOSE 3306
+
+COPY conf/configure.sh /tmp/configure.sh
+
+ENTRYPOINT ["sh", "/tmp/configure.sh"]

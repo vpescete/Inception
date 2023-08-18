@@ -1,7 +1,10 @@
 DOCKER_COMPOSE = docker-compose -f ./srcs/docker-compose.yml
 
+# linux:
+# 	@ echo "127.0.0.1 vpescete.42.fr" >> /etc/hosts
+
 all:
-	$(DOCKER_COMPOSE) up --build -d
+	$(DOCKER_COMPOSE) up -d --build
 
 stop:
 	$(DOCKER_COMPOSE) down

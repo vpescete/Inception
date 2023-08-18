@@ -7,25 +7,46 @@ services:
     container_name: nginx
     ports:
       - 443:443
-    networks:
-      - network
-    restart: always
-
-  wordpress:
-    container_name: wordpress
-    build:
-      context: ./requirements/wordpress
-    networks:
-      - network
     depends_on:
-      - nginx
+      - wordpress
+    networks:
+      - network
     volumes:
       - wordpress_data:/var/www/html
     restart: always
 
+  wordpress:
+    container_name: wordpress
+    depends_on:
+      - mariadb
+    build:
+      context: ./requirements/wordpress
+      dockerfile: Dockerfile
+    networks:
+      - network
+    volumes:
+      - wordpress_data:/var/www/html
+    env_file:
+      - .env
+    restart: always
+  
+  mariadb:
+    container_name: mariadb
+    build: ./requirements/mariadb
+    ports:
+      - 3306:3306
+    volumes:
+      - mariadb_data:/var/lib/mysql
+    networks:
+      - network
+    env_file:
+      - .env
+    restart: always
+
 volumes:
+  mariadb_data:
   wordpress_data:
 
 networks:
-    network:
-      driver: bridge
+  network:
+    driver: bridge
