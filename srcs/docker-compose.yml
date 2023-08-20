@@ -43,9 +43,53 @@ services:
       - .env
     restart: always
 
+
+# La sezione "volumes" definisce i volumi che possono essere utilizzati dai servizi.
+
+# Volume "mariadb_data":
+# - Questo volume è creato e chiamato "mariadb_data".
+# - Sarà utilizzato per memorizzare i dati del database di MariaDB.
+# - I dati persistenti, come le tabelle e gli schemi del database, verranno memorizzati all'interno di questo volume.
+# - Questo assicura che i dati del database sopravvivano anche dopo che il container MariaDB viene riavviato o eliminato.
+
+# Volume "wordpress_data":
+# - Questo volume è creato e chiamato "wordpress_data".
+# - Sarà utilizzato per memorizzare i file del sito WordPress.
+# - Questo può includere i file del tema, i plugin, le immagini caricati e altro.
+# - Anche in questo caso, i dati persistenti sopravvivono tra diverse esecuzioni dei container.
+
+# L'utilizzo dei volumi:
+# - L'utilizzo di volumi è essenziale per mantenere i dati persistenti attraverso le diverse esecuzioni dei container.
+# - I volumi consentono di separare i dati dai container, semplificando la migrazione e l'aggiornamento dei container stessi.
+
+# In pratica, i volumi "mariadb_data" e "wordpress_data" sono montati all'interno dei rispettivi container,
+# consentendo loro di accedere ai dati persistenti anche quando i container vengono modificati o sostituiti.
+
 volumes:
   mariadb_data:
   wordpress_data:
+
+
+
+# La sezione "networks" definisce le reti a cui i servizi possono essere collegati.
+
+# Creazione della rete "network":
+# - La rete "network" viene definita qui e può essere usata per collegare i container dei servizi specificati.
+
+# Driver di rete "bridge":
+# - Il driver di rete "bridge" crea una rete isolata all'interno del sistema host. È il driver predefinito per Docker.
+# - Ogni container collegato a questa rete "bridge" avrà un proprio indirizzo IP all'interno della rete.
+# - I container nella stessa rete "bridge" possono comunicare tra loro utilizzando gli indirizzi IP interni.
+
+# Perché utilizzare la rete "bridge" in questo caso:
+# - La rete "bridge" è comunemente utilizzata quando si desidera che i container possano comunicare tra loro sullo stesso host,
+#   ma si desidera anche isolamento tra le reti dei container e l'host.
+# - In questo scenario, i servizi come "nginx", "wordpress" e "mariadb" potrebbero dover comunicare tra loro.
+# - La rete "bridge" consente a questi servizi di comunicare attraverso gli indirizzi IP interni all'interno della stessa rete.
+# - L'isolamento fornito dalla rete "bridge" impedisce l'accesso diretto ai container da parte di reti esterne.
+
+# In generale, la rete "bridge" è una scelta comune quando si vuole mantenere una comunicazione efficiente tra i container
+# sullo stesso host, garantendo al contempo un certo grado di isolamento tra le reti dei container e l'host.
 
 networks:
   network:

@@ -1,14 +1,15 @@
 DOCKER_COMPOSE = docker-compose -f ./srcs/docker-compose.yml
 
-# linux:
-# 	@ echo "127.0.0.1 vpescete.42.fr" >> /etc/hosts
+# Aggiungi questa regola per impostare l'associazione tra vpescete.42.fr e l'IP di localhost
+set-hosts:
+	@echo "Aggiornamento del file /etc/hosts"
+	@echo "127.0.0.1 vpescete.42.fr" | sudo tee -a /etc/hosts
 
-all:
+all: set-hosts
 	$(DOCKER_COMPOSE) up -d --build
 
 stop:
 	$(DOCKER_COMPOSE) down
-
 clean:
 	@if [ -n "$$(docker ps -q)" ]; then docker stop $$(docker ps -q); fi
 	@if [ -n "$$(docker ps -aq)" ]; then docker rm $$(docker ps -aq); fi
@@ -19,7 +20,7 @@ clean:
 		awk '{ print $$1 }' | \
 		xargs -r docker network rm
 
-prune:
+prune: clean
 	@echo "This will remove all stopped containers, dangling images, and networks."
 	@echo "Use with caution! Press [Enter] to continue or [Ctrl+C] to cancel."
 	@read _

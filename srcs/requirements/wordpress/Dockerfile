@@ -1,5 +1,6 @@
 FROM alpine:3.13
 
+# Aggiunge un utente "nginx" e copia i file di configurazione di PHP-FPM
 RUN apk update && apk upgrade && \
 		apk add --no-cache \
 		wget \
@@ -56,18 +57,47 @@ RUN apk update && apk upgrade && \
 
 # adding nginx user
 RUN adduser -S nginx && addgroup -S nginx
+
+# Copia il file di configurazione specifico del pool PHP-FPM
+# Il file www.conf è utilizzato per definire le impostazioni del pool PHP-FPM.
+# Un pool rappresenta un gruppo di processi PHP-FPM che gestisce le richieste
+# per un'applicazione specifica. Questo file contiene parametri come il numero
+# massimo di processi, limiti di risorse, utenti e gruppi associati ai processi PHP, ecc.
 COPY conf/www.conf /etc/php7/php-fpm.d/www.conf
+
+# Copia il file di configurazione principale di PHP-FPM
+# Il file php-fpm.conf è il file di configurazione globale per l'intero
+# processo PHP-FPM. Contiene impostazioni globali che influenzano tutti i pool
+# PHP-FPM. Queste impostazioni includono parametri come il numero massimo di processi globali,
+# il limite delle risorse, le direttive di log, le impostazioni di controllo,
+# le connessioni di rete e altro. Questo file definisce il comportamento globale
+# di PHP-FPM all'interno del server.
 COPY conf/php-fpm.conf /etc/php7/php-fpm.conf
 
-# static website
+
+# Copia un file HTML statico per il sito
 COPY conf/index.html /tmp/index.html
 
-# install wordpress
+# WP-CLI (WordPress Command Line Interface) è uno strumento da riga di comando
+# progettato per semplificare la gestione di WordPress attraverso comandi
+# da eseguire nella shell. Fornisce una vasta gamma di funzionalità per
+# gestire siti, temi, plugin, utenti e altro senza dover utilizzare
+# l'interfaccia utente del pannello di amministrazione di WordPress.
+#
+# L'installazione di WP-CLI qui consente di utilizzare questo strumento
+# all'interno del container Docker per automatizzare compiti di gestione
+# di WordPress come installazione, aggiornamento e configurazione.
+# WP-CLI può essere utilizzato per creare script automatizzati o per
+# interagire con WordPress in ambienti di sviluppo e produzione.
+#
+# Installa WP-CLI (WordPress Command Line Interface)
 RUN wget https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
 RUN chmod +x wp-cli.phar
 RUN cp wp-cli.phar /usr/bin/wp
 
+# Imposta la directory di lavoro e copia uno script di configurazione
 WORKDIR /var/www/html/wordpress
-
 COPY tools/configure.sh /tmp/configure.sh
+
+# Punto di ingresso per l'esecuzione dello script di configurazione
 ENTRYPOINT [ "sh", "/tmp/configure.sh" ]
