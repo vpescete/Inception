@@ -1,5 +1,7 @@
+# Utilizza l'immagine base Debian Buster
 FROM debian:buster
 
+# Aggiorna le repository e installa i pacchetti necessari
 RUN apt-get update && apt-get -y install \
 	wget \
 	curl \
@@ -15,28 +17,27 @@ RUN apt-get update && apt-get -y install \
 	php-redis \
 	&& rm -rf /var/lib/apt/lists/*
 
-# I need to install wp_cli command and put it in the right directory /usr/local/bin
+# Scarica e installa l'utilità WP-CLI per la gestione di WordPress
 RUN curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar \
   && chmod +x wp-cli.phar \
   && mv wp-cli.phar /usr/local/bin/wp
 
-# Copy the .conf in the html directory
+# Copia il file di configurazione www.conf nella directory corretta per PHP-FPM
 COPY ./conf/www.conf /etc/php/7.3/fpm/pool.d/
 
-#Create the folder to enable php start
+# Crea la cartella per abilitare l'avvio di PHP-FPM
 RUN mkdir /run/php
 
-#we copy the script, give the right to launch it in local on our computer
+# Copia lo script configure.sh e concede i permessi per eseguirlo
 COPY ./tools/configure.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/configure.sh
 ENTRYPOINT ["/usr/local/bin/configure.sh"]
 
-#We go the html directory
+# Imposta la directory di lavoro nella cartella HTML
 WORKDIR /var/www/html/
 
-#We expose the 9000 port
+# Espone la porta 9000 su cui PHP-FPM ascolterà le richieste
 EXPOSE 9000
 
-#Launch PHP FPM in foreground and ignore deamonize from conf file (-F)
+# Avvia PHP-FPM in foreground e ignora l'opzione daemonize dal file di configurazione (-F)
 CMD ["/usr/sbin/php-fpm7.3", "-F"]
-

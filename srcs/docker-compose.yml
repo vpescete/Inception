@@ -2,45 +2,49 @@ version: '3.8'
 
 services:
 
+  # Servizio Nginx: Web Server e Proxy Inverso
   nginx:
-    build: ./requirements/nginx
-    container_name: nginx
+    build: ./requirements/nginx  # Utilizza il Dockerfile nella directory ./requirements/nginx
+    container_name: nginx  # Nome del container per il servizio Nginx
     ports:
-      - 443:443
+      - 443:443  # Mappa la porta 443 del host alla porta 443 del container (HTTPS)
     networks:
-      - network
+      - network  # Collega il servizio alla rete "network"
     volumes:
-      - wordpress_data:/var/www/html
-    restart: always
-    # depends_on:
-    #   - wordpress
-  mariadb:
-    container_name: mariadb
-    build: ./requirements/mariadb
-    ports:
-      - 3306:3306
-    volumes:
-      - mariadb_data:/var/lib/mysql
-    networks:
-      - network
-    env_file:
-      - .env
-    restart: always
+      - wordpress_data:/var/www/html  # Monta il volume "wordpress_data" nella directory /var/www/html del container
+    restart: always  # Riavvia sempre il container in caso di errore o riavvio del sistema
 
-  wordpress:
-    container_name: wordpress
-    depends_on:
-      - mariadb
-    build:
-      context: ./requirements/wordpress
-      dockerfile: Dockerfile
-    networks:
-      - network
+
+  # Servizio MariaDB: Database
+  mariadb:
+    container_name: mariadb  # Nome del container per il servizio MariaDB
+    build: ./requirements/mariadb  # Utilizza il Dockerfile nella directory ./requirements/mariadb
+    ports:
+      - 3306:3306  # Mappa la porta 3306 del host alla porta 3306 del container (MySQL)
     volumes:
-      - wordpress_data:/var/www/html
+      - mariadb_data:/var/lib/mysql  # Monta il volume "mariadb_data" nella directory /var/lib/mysql del container
+    networks:
+      - network  # Collega il servizio alla rete "network"
     env_file:
-      - .env
-    restart: always
+      - .env  # Carica le variabili d'ambiente dal file .env nella root
+    restart: always  # Riavvia sempre il container in caso di errore o riavvio del sistema
+
+
+  # Servizio WordPress: Applicazione Web
+  wordpress:
+    container_name: wordpress  # Nome del container per il servizio WordPress
+    depends_on:
+      - mariadb  # Dipende dal servizio MariaDB (deve essere avviato prima)
+    build:
+      context: ./requirements/wordpress  # Utilizza il Dockerfile nella directory ./requirements/wordpress
+      dockerfile: Dockerfile  # Specifica il nome del Dockerfile
+    networks:
+      - network  # Collega il servizio alla rete "network"
+    volumes:
+      - wordpress_data:/var/www/html  # Monta il volume "wordpress_data" nella directory /var/www/html del container
+    env_file:
+      - .env  # Carica le variabili d'ambiente dal file .env nella root
+    restart: always  # Riavvia sempre il container in caso di errore o riavvio del sistema
 
 
 # La sezione "volumes" definisce i volumi che possono essere utilizzati dai servizi.
@@ -67,8 +71,6 @@ services:
 volumes:
   mariadb_data:
   wordpress_data:
-
-
 
 # La sezione "networks" definisce le reti a cui i servizi possono essere collegati.
 
