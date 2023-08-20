@@ -1,24 +1,34 @@
-# Dockerfile per un'immagine Alpine Linux con MariaDB
-#
-# Questo Dockerfile definisce l'immagine di base utilizzando Alpine Linux 3.13
-# e aggiunge il sistema di gestione di database MariaDB e il client MariaDB.
-# La porta 3306, utilizzata da MariaDB per le connessioni al database, viene esposta.
-# L'immagine include uno script di configurazione chiamato "configure.sh", che verrà eseguito
-# come punto di ingresso quando il container viene avviato.
+FROM debian:buster
 
-# Usa l'immagine di base Alpine Linux 3.13
-FROM alpine:3.13
+RUN apt-get update
+RUN apt-get install -y mariadb-server \
+    mariadb-client \
+    vim \
+    && rm -rf /var/lib/apt/lists/*
 
-# Aggiorna e installa il sistema di gestione di database MariaDB e il client MariaDB
-RUN apk update && apk upgrade && apk add --no-cache \
-        mariadb \
-        mariadb-client
+#Allow to run the daemon of mysql
+# Purge and re-create /var/lib/mysql with appropriate ownership
+# ensure that /var/run/mysqld (used for socket and lock files) is writable regardless of the UID our mysqld instance ends up having at runtime
+RUN mkdir -p /var/run/mysqld \
+&& chown -R mysql:mysql /var/run/mysqld \
+&& chmod 777 /var/run/mysqld
 
-# Espone la porta 3306 per le connessioni a MariaDB
 EXPOSE 3306
 
-# Copia lo script di configurazione nella directory temporanea del container
-COPY conf/configure.sh /tmp/configure.sh
+COPY	./conf/mysqld.conf ~/my.cnf
+COPY	./conf/mysqld.conf /etc/mysql/my.cnf
+COPY	./conf/mysqld.conf /etc/my.cnf
 
-# Imposta lo script di configurazione come punto di ingresso per il container
-ENTRYPOINT ["sh", "/tmp/configure.sh"]
+
+#Copy of the .sh and .sql in the /bin of the container to be able to run the program
+# Give the right to execute + launch the .sh
+COPY ./tools/configure.sh /usr/local/bin/
+COPY ./conf/wordpress.sql /usr/local/bin/
+RUN chmod +x /usr/local/bin/configure.sh
+RUN chmod +x /usr/local/bin/wordpress.sql
+
+ENTRYPOINT [ "/usr/local/bin/configure.sh" ]
+
+#Command to launch mariadb and enable the database to listen globally - also can be put on mysqldump.cnf file
+CMD ["mysqld", "--bind-address=0.0.0.0"]
+
