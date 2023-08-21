@@ -1,42 +1,47 @@
 #!/bin/sh
 
-# Installa e configura MySQL
-mysql_install_db
-
-# Avvia il servizio MySQL
-/etc/init.d/mysql start
-
-# Verifica se il database esiste
-if [ -d "/var/lib/mysql/$WP_DATABASE" ]; then
-	echo "Il database esiste già."
-else
-	# Imposta l'opzione root per impedire la connessione senza password di root
-
-	mysql_secure_installation << _EOF_
-	Y
-	123456rootDB
-	123456rootDB
-	Y
-	n
-	Y
-	Y
-
-_EOF_
-
-	# Aggiungi un utente root su 127.0.0.1 per consentire la connessione remota
-	# FLUSH PRIVILEGES permette alle tue tabelle SQL di essere aggiornate automaticamente quando le modifichi
-	# mysql -uroot avvia il client mysql da linea di comando
-	echo "GRANT ALL ON *.* TO 'root'@'%' IDENTIFIED BY '$WP_ROOT_PWD'; FLUSH PRIVILEGES;" | mysql -uroot
-
-	# Crea il database e l'utente nel database per WordPress
-	echo "CREATE DATABASE IF NOT EXISTS $WP_DATABASE; GRANT ALL ON $WP_DATABASE.* TO '$WP_USER'@'%' IDENTIFIED BY '$WP_PWD'; FLUSH PRIVILEGES;" | mysql -u root
-
-	# Importa il database nella linea di comando MySQL
-	mysql -uroot -p$WP_ROOT_PWD $WP_DATABASE < /usr/local/bin/wordpress.sql
+if [ ! -d "/run/mysqld" ]; then
+	mkdir -p /run/mysqld
+	chown -R mysql:mysql /run/mysqld
 fi
 
-# Arresta il servizio MySQL
-/etc/init.d/mysql stop
+if [ ! -d "/var/lib/mysql/mysql" ]; then
+	
+	chown -R mysql:mysql /var/lib/mysql
 
-# Esegui il comando passato agli argomenti dello script
-exec "$@"
+	# init database
+	mysql_install_db --basedir=/usr --datadir=/var/lib/mysql --user=mysql --rpm > /dev/null
+
+	tfile=`mktemp`
+	if [ ! -f "$tfile" ]; then
+		return 1
+	fi
+
+	# https://stackoverflow.com/questions/10299148/mysql-error-1045-28000-access-denied-for-user-billlocalhost-using-passw
+	cat << EOF > $tfile
+USE mysql;
+FLUSH PRIVILEGES;
+
+DELETE FROM	mysql.user WHERE User='';
+DROP DATABASE test;
+DELETE FROM mysql.db WHERE Db='test';
+DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1');
+
+ALTER USER 'root'@'localhost' IDENTIFIED BY '$MYSQL_ROOT_PASSWORD';
+
+CREATE DATABASE $MYSQL_DATABASE CHARACTER SET utf8 COLLATE utf8_general_ci;
+CREATE USER '$MYSQL_USER'@'%' IDENTIFIED by '$MYSQL_PASSWORD';
+GRANT ALL PRIVILEGES ON $MYSQL_DATABASE.* TO '$MYSQL_USER'@'%';
+
+FLUSH PRIVILEGES;
+EOF
+	# run init.sql
+	/usr/bin/mysqld --user=mysql --bootstrap < $tfile
+	rm -f $tfile
+fi
+
+# allow remote connections
+sed -i "s|skip-networking|# skip-networking|g" /etc/my.cnf.d/mariadb-server.cnf
+sed -i "s|.*bind-address\s*=.*|bind-address=0.0.0.0|g" /etc/my.cnf.d/mariadb-server.cnf
+
+exec /usr/bin/mysqld --user=mysql --console

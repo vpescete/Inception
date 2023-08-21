@@ -1,39 +1,25 @@
 #!/bin/sh
 
-# Questo è uno script di shell che automatizza il processo di download e configurazione di WordPress.
-# Si basa su variabili d'ambiente definite in un file .env (nella directory superiore).
+# wait for mysql
+while ! mariadb -h$MYSQL_HOSTNAME -u$MYSQL_USER -p$MYSQL_PASSWORD $MYSQL_DATABASE &>/dev/null; do
+    sleep 3
+done
 
-# Carica le variabili d'ambiente da un file .env (nella directory superiore)
-source ../../../.env
+if [ ! -f "/var/www/html/index.html" ]; then
 
-# Verifica se il file wp-config.php esiste già
-if [ -f ./wp-config.php ]; then
-    echo "WordPress è già stato scaricato in precedenza."
-else
-    # Scarica l'archivio compresso di WordPress dalla rete
-	wget http://wordpress.org/latest.tar.gz
+    # static website
+    mv /tmp/domobite/* /var/www/html/
 
-    # Estrai il contenuto dell'archivio compresso
-	tar xfz latest.tar.gz
+ 	# adminer
+    wget https://github.com/vrana/adminer/releases/download/v4.8.1/adminer-4.8.1-mysql-en.php -O /var/www/html/adminer.php &> /dev/null
+    wget https://raw.githubusercontent.com/Niyko/Hydra-Dark-Theme-for-Adminer/master/adminer.css -O /var/www/html/adminer.css &> /dev/null
 
-    # Sposta i file di WordPress nella directory corrente
-	mv wordpress/* .
-
-    # Elimina l'archivio compresso e la directory temporanea
-	rm -rf latest.tar.gz
-	rm -rf wordpress
-
-	# Sostituisci le variabili nei file di configurazione con i valori dell'ambiente
-    # Queste variabili sono definite nel file .env
-	sed -i "s/username_here/$WP_USER/g" wp-config-sample.php
-	sed -i "s/password_here/$WP_PWD/g" wp-config-sample.php
-	sed -i "s/localhost/$WP_HOSTNAME/g" wp-config-sample.php
-	sed -i "s/database_name_here/$WP_DATABASE/g" wp-config-sample.php
-
-    # Crea una copia del file di configurazione rinominandolo in wp-config.php
-	cp wp-config-sample.php wp-config.php
+    wp core download --allow-root
+    wp config create --dbname=$MYSQL_DATABASE --dbuser=$MYSQL_USER --dbpass=$MYSQL_PASSWORD --dbhost=$MYSQL_HOSTNAME --dbcharset="utf8" --dbcollate="utf8_general_ci" --allow-root
+    wp core install --url=$DOMAIN_NAME/wordpress --title=domobite --admin_user=$WP_USER_ADMIN --admin_password=$WP_PWD_ADMIN --admin_email=$WP_EMAIL_ADMIN --skip-email --allow-root
+    wp user create $WP_USR $WP_EMAIL --role=author --user_pass=$WP_PWD --allow-root
+    wp theme install inspiro --activate --allow-root
 fi
 
-# Avvia il comando passato come argomenti
-# Questa riga eseguirà il comando specificato quando si avvia il container basato su questo script
-exec "$@"
+echo "Wordpress started on :9000"
+/usr/sbin/php-fpm7 -F -R

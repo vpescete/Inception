@@ -8,6 +8,8 @@ services:
     container_name: nginx  # Nome del container per il servizio Nginx
     ports:
       - 443:443  # Mappa la porta 443 del host alla porta 443 del container (HTTPS)
+    depends_on:
+      - wordpress
     networks:
       - network  # Collega il servizio alla rete "network"
     volumes:
@@ -41,7 +43,7 @@ services:
     networks:
       - network  # Collega il servizio alla rete "network"
     volumes:
-      - wordpress_data:/var/www/html  # Monta il volume "wordpress_data" nella directory /var/www/html del container
+      - wordpress_data:/var/www/html/  # Monta il volume "wordpress_data" nella directory /var/www/html del container
     env_file:
       - .env  # Carica le variabili d'ambiente dal file .env nella root
     restart: always  # Riavvia sempre il container in caso di errore o riavvio del sistema
@@ -70,7 +72,18 @@ services:
 
 volumes:
   mariadb_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /home/vpescete/data/mariadb_data
   wordpress_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /home/vpescete/data/wordpress_data
+
 
 # La sezione "networks" definisce le reti a cui i servizi possono essere collegati.
 

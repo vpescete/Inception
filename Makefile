@@ -1,12 +1,15 @@
 DOCKER_COMPOSE = docker-compose -f ./srcs/docker-compose.yml
 
+
+all: 
+	@mkdir /home/vpescete/data/mariadb_data
+	@mkdir /home/vpescete/data/wordpress_data
+	$(DOCKER_COMPOSE) up -d --build
+
 # Aggiungi questa regola per impostare l'associazione tra vpescete.42.fr e l'IP di localhost
 set-hosts:
 	@echo "Aggiornamento del file /etc/hosts"
 	@echo "127.0.0.1 vpescete.42.fr" | sudo tee -a /etc/hosts
-
-all: set-hosts
-	$(DOCKER_COMPOSE) up -d --build
 
 stop:
 	$(DOCKER_COMPOSE) down
@@ -19,6 +22,7 @@ clean:
 		grep -vE '(bridge|host|none)' | \
 		awk '{ print $$1 }' | \
 		xargs -r docker network rm
+	@sudo rm -rf /home/vpescete/data/*
 
 prune: clean
 	@echo "This will remove all stopped containers, dangling images, and networks."
