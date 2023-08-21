@@ -25,8 +25,5 @@ clean:
 	@sudo rm -rf /home/vpescete/data/*
 
 prune: clean
-	@echo "This will remove all stopped containers, dangling images, and networks."
-	@echo "Use with caution! Press [Enter] to continue or [Ctrl+C] to cancel."
-	@read _
-	docker system prune -a
+	@docker system prune -a
 

@@ -14,8 +14,7 @@ if [ ! -f "/var/www/html/index.html" ]; then
     wp config create --dbname=$MYSQL_DATABASE --dbuser=$MYSQL_USER --dbpass=$MYSQL_PASSWORD --dbhost=$MYSQL_HOSTNAME --dbcharset="utf8" --dbcollate="utf8_general_ci" --allow-root
     wp core install --url=$DOMAIN_NAME/wordpress --title=domobite --admin_user=$WP_USER_ADMIN --admin_password=$WP_PWD_ADMIN --admin_email=$WP_EMAIL_ADMIN --skip-email --allow-root
     wp user create $WP_USR $WP_EMAIL --role=author --user_pass=$WP_PWD --allow-root
-    wp theme install inspiro --activate --allow-root
+    wp theme install bizboost --activate --allow-root
 fi
 
-echo "Wordpress started on :9000"
 /usr/sbin/php-fpm7 -F -R
