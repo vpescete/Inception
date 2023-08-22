@@ -1,10 +1,14 @@
 DOCKER_COMPOSE = docker-compose -f ./srcs/docker-compose.yml
-
+RUN_WITH_COLOR = ./run_with_color.sh
 
 all: 
-	@mkdir /home/vpescete/data/mariadb_data
-	@mkdir /home/vpescete/data/wordpress_data
-	$(DOCKER_COMPOSE) up -d --build
+	@if [ ! -d /home/vpescete/data/mariadb_data ]; then \
+        mkdir -p /home/vpescete/data/mariadb_data; \
+	fi
+	@if [ ! -d /home/vpescete/data/wordpress_data ]; then \
+        mkdir -p /home/vpescete/data/wordpress_data; \
+    fi
+	@$(RUN_WITH_COLOR) $(DOCKER_COMPOSE) up -d --build
 
 # Aggiungi questa regola per impostare l'associazione tra vpescete.42.fr e l'IP di localhost
 set-hosts:
@@ -25,5 +29,5 @@ clean:
 	@sudo rm -rf /home/vpescete/data/*
 
 prune: clean
-	@docker system prune -a
+	docker system prune -a
 

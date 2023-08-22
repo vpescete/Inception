@@ -1,6 +1,6 @@
 FROM alpine:3.13
 
-RUN	apk update && apk upgrade && apk add --no-cache \
+RUN apk update && apk upgrade && apk add --no-cache \
 		wget				\
         tar                 \
 		mariadb-client		\
@@ -54,7 +54,7 @@ RUN	apk update && apk upgrade && apk add --no-cache \
 		
 
 # php config
-RUN	adduser -S nginx &&	addgroup -S nginx
+RUN adduser -S nginx &&	addgroup -S nginx
 COPY conf/php-fpm.conf /etc/php7/php-fpm.conf
 COPY conf/www.conf /etc/php7/php-fpm.d/www.conf
 
